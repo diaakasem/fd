@@ -212,7 +212,7 @@ fn construct_config(mut opts: Opts, pattern_regexps: &[String]) -> Result<Config
 
     #[cfg(windows)]
     let ansi_colors_support =
-        ansi_term::enable_ansi_support().is_ok() || std::env::var_os("TERM").is_some();
+        nu_ansi_term::enable_ansi_support().is_ok() || std::env::var_os("TERM").is_some();
     #[cfg(not(windows))]
     let ansi_colors_support = true;
 
@@ -239,8 +239,11 @@ fn construct_config(mut opts: Opts, pattern_regexps: &[String]) -> Result<Config
         ignore_hidden: !(opts.hidden || opts.rg_alias_ignore()),
         read_fdignore: !(opts.no_ignore || opts.rg_alias_ignore()),
         read_vcsignore: !(opts.no_ignore || opts.rg_alias_ignore() || opts.no_ignore_vcs),
+        require_git_to_read_vcsignore: !opts.no_require_git,
         read_parent_ignore: !opts.no_ignore_parent,
-        read_global_ignore: !opts.no_ignore || opts.rg_alias_ignore() || opts.no_global_ignore_file,
+        read_global_ignore: !(opts.no_ignore
+            || opts.rg_alias_ignore()
+            || opts.no_global_ignore_file),
         follow_links: opts.follow,
         one_file_system: opts.one_file_system,
         null_separator: opts.null_separator,
